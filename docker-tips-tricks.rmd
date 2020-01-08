@@ -1,0 +1,204 @@
+---
+title: "Docker tips and tricks for developers"
+author: Piotr Zalewski
+date: 6-01-2020
+output:
+  beamer_presentation:
+    fig_caption: false
+    theme: "AnnArbor"
+    colortheme: "dolphin"
+    fonttheme: "structurebold"
+---
+
+
+
+# Docker tips and tricks for developers
+
+What is this presentation about ?
+
+
+Not about production, not about deploying
+
+We will talk about using developer tools packed in docker images.
+
+
+## Why use docker on your workstation ?
+
+Isolation
+
+
+__zdjecie szuflady__
+
+
+# Using ready images of tools
+
+![hub.docker.com](docker-tips-tricks/dockerhub.png)\
+
+
+| Tool name | count |
+|:---------:|------:|
+|mysql      | 18.163|
+|postgresql |  4.137|
+|java       | 21.419|
+|consul     |  2.989|
+
+
+# Postgresql
+
+```
+docker run --name pg9.6 -e POSTGRES_PASSWORD=mysecret 
+    -d postgres:9.6
+docker run --name pg11 -e POSTGRES_PASSWORD=mysecret 
+    -d postgres:11
+
+```
+![postgresql](docker-tips-tricks/dtt_postgres.png)\
+
+
+# VSCode
+
+```bash
+docker run -it -p 8080:8080 
+    -v "$(pwd):/home/coder/project" 
+    codercom/code-server --auth none 
+```
+![vscode](docker-tips-tricks/dtt_vscode.png)\
+
+
+# Passing secrets to apps
+
+```
+docker run -it --rm 
+   -e AWS_SECRET_KEY = XXXSSDSXSXXXX
+   -e AWS_ACCESS_KEY = XSwewedfwewee
+    pzalews/awscli
+    aws rds describe-db-instances --output table
+
+docker run -it --rm -v ~/.aws:/aws/.aws:ro 
+    pzalews/awscli
+    aws rds describe-db-instances --output table
+
+alias awsd='docker run -it --rm -v "$(pwd):/aws" 
+          -v ~/.aws:/aws/.aws:ro -e AWS_PROFILE=had-dev 
+          pzalews/awscli aws'
+```
+
+![awsd](docker-tips-tricks/dtt_aws_2.png)\
+
+
+# Network mode host
+
+```
+alias consul='docker run -d --rm 
+-e CONSUL_BIND_INTERFACE=enxa44cc8d6bc80 
+--net=host 
+consul'
+
+```
+
+# Debug network interfaces
+
+```
+docker run --name ubuntu -it ubuntu /bin/bash
+docker run --net=container:ubuntu 
+       -v $(pwd)/temp:/dump  
+       corfr/tcpdump -s 65535 -w /dump/test.dump
+```
+![wireshark](docker-tips-tricks/dtt_wireshark.png)
+
+
+# Kali Linux
+
+![kalilinux](docker-tips-tricks/dtt_kali.png)
+
+``` 
+docker run -d -p 6080:6080 lukaszlach/kali-desktop:xfce-top10
+```
+
+# Dockerizing your tools
+
+# Dockerfile
+
+![dockerfile](docker-tips-tricks/dtt_dockerfile_examples.png)\
+
+
+# Dockerfile - layers
+
+![dockerfile](docker-tips-tricks/dtt_dockerfile_examples2.png)\
+
+
+# Docker image history
+
+![imagehistory](docker-tips-tricks/dtt_image_history.png)\ 
+
+
+
+# Layers cache
+
+![cache](docker-tips-tricks/dtt_build.png)\
+
+
+![cache](docker-tips-tricks/dtt_build2.png)\
+
+
+# Docker buildkit
+
+export DOCKER_BUILDKIT=1
+(starting from Docker 18.09)
+
+- new tty output
+- better caching 
+- mounting some folders for build time
+- adding secret informations for build time
+
+
+# Dockerignore 
+
+One of first steps in build process is sending build context to docker daemon.
+
+Default build contect is whole directory with all subfolders.
+
+Tip: The rule of thumb is not adding files to the build context, if you do not need them in your Docker image. The Docker context should be minimal and secret-free.
+
+Use wiesly .dockerignore
+
+# Scanners - hadolint
+
+Best practices for Dockerfile
+
+```
+docker run --rm -i hadolint/hadolint < Dockerfile
+
+```
+
+![hadolint](docker-tips-tricks/dtt_hadolint.png)\
+
+
+# CMD and ENTRYPOINT
+
+# Fast use docker apps (Azure Container Instances)
+
+
+# Cleaninig after work
+
+# logs
+add "log-opts": { "max-size": "10m", "max-file":"3"} to daemon.logs
+add log-driver to local
+
+# other logs drivers
+
+# docker system prune
+
+docker run -d --restart=unless-stopped --name cleanup -v /var/run/docker.sock:/var/run/docker.sock docker /bin/sh -c "while true; do docker system prune -f && date ; sleep 24h; done"
+
+This doesn't clean by default:
+* Running containers
+* tagged images
+* volumes
+
+
+# tips for java
+
+java - cpu and memery , heapsize https://youtu.be/RwtrLjh8_SU?t=2609
+
+
