@@ -22,12 +22,17 @@ Not about production, not about deploying
 We will talk about using developer tools packed in docker images.
 
 
-## Why use docker on your workstation ?
+# Why use docker on your workstation ?
 
 Isolation
 
+![drawer](docker-tips-tricks/dtt_drawer.jpg)\ 
 
-__zdjecie szuflady__
+
+# Why use docker on your workstation ?
+
+* Isolation
+* Experience with docker
 
 
 # Using ready images of tools
@@ -122,6 +127,34 @@ docker run -d -p 6080:6080 lukaszlach/kali-desktop:xfce-top10
 ![dockerfile](docker-tips-tricks/dtt_dockerfile_examples.png)\
 
 
+# CMD and ENTRYPOINT
+
+
+
+# ADD vs COPY
+
+
+# Docker buildkit
+
+export DOCKER_BUILDKIT=1
+(starting from Docker 18.09)
+
+- new tty output
+- better caching 
+- mounting some folders for build time
+- adding secret informations for build time
+
+# Docker buildkit
+
+![old](docker-tips-tricks/dtt_oldbuild.png)\
+
+
+# Docker buildkit
+
+![new](docker-tips-tricks/dtt_build.png)\
+
+
+
 # Dockerfile - layers
 
 ![dockerfile](docker-tips-tricks/dtt_dockerfile_examples2.png)\
@@ -141,18 +174,8 @@ docker run -d -p 6080:6080 lukaszlach/kali-desktop:xfce-top10
 ![cache](docker-tips-tricks/dtt_build2.png)\
 
 
-# Docker buildkit
 
-export DOCKER_BUILDKIT=1
-(starting from Docker 18.09)
-
-- new tty output
-- better caching 
-- mounting some folders for build time
-- adding secret informations for build time
-
-
-# Dockerignore 
+# Docker build context
 
 One of first steps in build process is sending build context to docker daemon.
 
@@ -161,6 +184,12 @@ Default build contect is whole directory with all subfolders.
 Tip: The rule of thumb is not adding files to the build context, if you do not need them in your Docker image. The Docker context should be minimal and secret-free.
 
 Use wiesly .dockerignore
+
+
+# Docker build context
+```
+docker build -f- out/ < Dockerfile
+```
 
 # Scanners - hadolint
 
@@ -174,7 +203,6 @@ docker run --rm -i hadolint/hadolint < Dockerfile
 ![hadolint](docker-tips-tricks/dtt_hadolint.png)\
 
 
-# CMD and ENTRYPOINT
 
 # Fast use docker apps (Azure Container Instances)
 
@@ -183,22 +211,40 @@ docker run --rm -i hadolint/hadolint < Dockerfile
 
 # logs
 add "log-opts": { "max-size": "10m", "max-file":"3"} to daemon.logs
-add log-driver to local
 
 # other logs drivers
 
+you could use "syslog" for redirect all logs to syslog
+
+
 # docker system prune
 
-docker run -d --restart=unless-stopped --name cleanup -v /var/run/docker.sock:/var/run/docker.sock docker /bin/sh -c "while true; do docker system prune -f && date ; sleep 24h; done"
+```
+docker system prune
+```
+
 
 This doesn't clean by default:
 * Running containers
 * tagged images
 * volumes
 
+#restart option
 
-# tips for java
+![restart](docker-tips-tricks/dtt_restart.png)\ 
 
-java - cpu and memery , heapsize https://youtu.be/RwtrLjh8_SU?t=2609
+
+# docker system prune
+
+```
+docker run -d --restart=unless-stopped --name cleanup -v /var/run/docker.sock:/var/run/docker.sock docker /bin/sh -c "while true; do docker system prune -f && date ; sleep 24h; done"
+
+```
+
+# java multistage build
+
+Show time
+
+
 
 
