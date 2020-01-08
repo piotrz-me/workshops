@@ -24,7 +24,6 @@ We will talk about using developer tools packed in docker images.
 
 # Why use docker on your workstation ?
 
-Isolation
 
 ![drawer](docker-tips-tricks/dtt_drawer.jpg)\ 
 
@@ -202,9 +201,6 @@ docker run --rm -i hadolint/hadolint < Dockerfile
 
 ![hadolint](docker-tips-tricks/dtt_hadolint.png)\
 
-
-
-# Fast use docker apps (Azure Container Instances)
 
 
 # Cleaninig after work
