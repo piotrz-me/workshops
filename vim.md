@@ -21,7 +21,7 @@
     :vimgrep cos \*\* lub :grep -R 
     :cn - next 
     :cp - previous
-    :clist - lista
+    :clist - lista - better :cw
     :cclose - wyjście z tego trybu
 
 #####FILES
